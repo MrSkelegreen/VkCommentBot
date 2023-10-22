@@ -1,0 +1,87 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:vm="using:VkCommentBot.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+		x:DataType="vm:PostsVM"
+        x:Class="VkCommentBot.Views.PostsWindow"
+		Icon="/Assets/avalonia-logo.ico"
+		xmlns:l="https://github.com/avaloniaui"
+		xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+		WindowState="Maximized"
+        Title="VkCommentBot" WindowStartupLocation="CenterScreen">
+
+
+
+	<Grid ShowGridLines="False">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="50"/>
+			<ColumnDefinition/>
+			<ColumnDefinition Width="50"/>
+		</Grid.ColumnDefinitions>
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="100"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="100"/>
+		</Grid.RowDefinitions>
+
+		<TextBlock Grid.Column="1" Text="Список публикаций" FontSize="60" VerticalAlignment="Center"/>		
+
+		<DataGrid Name="DGrid" Grid.Column="1" Grid.Row="1"  GridLinesVisibility="All" BorderThickness="1"  ItemsSource="{Binding Posts}" SelectedItem="{Binding SelectedPost}" IsVisible="{Binding IsDGridVisible}">
+			<DataGrid.Columns>
+
+				<DataGridTextColumn Header="id" IsReadOnly="True" Width="Auto"	 Binding="{Binding VkId}"/>
+
+				<DataGridTextColumn Header="Контент" IsReadOnly="True" Width="*" Binding="{Binding PostText}"/>
+
+				<DataGridTextColumn Header="Статус"  IsReadOnly="True" Width="120" Binding="{Binding PostStatus}" />
+
+				<DataGridTextColumn Header="Сценарии"  IsReadOnly="True" Width="Auto" Binding="{Binding Scenarios.Count}"/>
+
+			</DataGrid.Columns>
+		</DataGrid>
+
+		<StackPanel Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="2" VerticalAlignment="Center" Orientation="Horizontal">
+			
+			<Button Name="LoadPostsButton" Grid.Column="1" Grid.Row="2" Content="Обновить" Width="180" Height="50"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="30" Command="{Binding LoadPostsCommand}"/>		
+									
+			<TextBlock Text="Бот" FontSize="30" VerticalAlignment="Center" Margin="50,0,0,0" IsVisible="{Binding IsDGridVisible}"/>
+			<ToggleSwitch OffContent="" OnContent="" FontSize="30" Margin="20,0,0,0" VerticalAlignment="Center" IsChecked="{Binding Helper.BotStatus}" IsVisible="{Binding IsDGridVisible}" Command="{Binding ChangeBotStatusCommand}" CommandParameter="{Binding Helper}"/>
+
+			<StackPanel Name="Settings" Orientation="Horizontal" IsVisible="{Binding IsGroupSettingsVisible}" Margin="50,0,0,0">
+				<TextBox Width="150" Height="40" HorizontalAlignment="Right" VerticalContentAlignment="Center" Watermark="Id группы" Text="{Binding GroupSettings.owner_id}"/>
+				<TextBox Width="160" Height="40" Margin="10,0,0,0" HorizontalAlignment="Right" VerticalContentAlignment="Center" Watermark="Токен группы" Text="{Binding GroupSettings.group_token}"/>
+				<TextBox Width="160" Height="40" Margin="10,0,0,0" HorizontalAlignment="Right" VerticalContentAlignment="Center" Watermark="Токен пользователя" Text="{Binding GroupSettings.user_token}"/>
+							
+				<Button Margin="5,0,0,30" Height="20" Width="20" Background="White" Command="{Binding ChangeSettingsVisibilityCommand}">
+					<Image Height="20" Width="20" Source="/Assets/minusIcon.png"/>
+				</Button>			
+				
+			</StackPanel>
+
+			<Button Content="Настройки" IsVisible="{Binding IsSettingsButtonVisible}" Command="{Binding ChangeSettingsVisibilityCommand}" Margin="10,0,0,0"/>
+
+			<ListBox Name="Messages" ItemsSource="{Binding Messages}" Background="Transparent" Height="100" Width="600" Margin="50,0,0,0" Grid.Column="1">
+				<ListBox.ItemTemplate>
+					<DataTemplate>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<TextBox FontSize="10" Text="{Binding}" BorderThickness="0" AcceptsReturn="True" TextWrapping="Wrap" IsReadOnly="True" Grid.Column="0"/>
+							<Button Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0,0,0" Background="Transparent" Command="{Binding $parent[ListBox].((vm:PostsVM)DataContext).DeleteMessageCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ListBoxItem}}}">
+								<Image Source="/Assets/close.png" Width="10" Height="15"/>
+							</Button>
+						</Grid>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>			
+
+		</StackPanel>
+
+	</Grid>
+
+</Window>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+	<connectionStrings>
+		<add name="Connection" connectionString=""/>
+	</connectionStrings>
+
+	<appSettings>
+		<add key="GroupId" value=""/>
+		<add key ="UserToken" value=""/>
+		<add key ="GroupToken" value=""/>
+		<add key="ApiAddress" value=""/>
+		<add key="ApiKey" value=""/>
+	</appSettings>
+	
+</configuration>

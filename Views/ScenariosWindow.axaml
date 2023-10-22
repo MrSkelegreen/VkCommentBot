@@ -1,0 +1,121 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:VkCommentBot.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:model="using:VkCommentBot.Models"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="VkCommentBot.Views.ScenariosWindow"
+        x:DataType="vm:ScenariosVM"
+        Icon="/Assets/avalonia-logo.ico"
+		WindowState="Maximized"
+        Title="VkCommentBot" WindowStartupLocation="CenterScreen">
+
+	<Grid ShowGridLines="False">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="50"/>
+			<ColumnDefinition/>
+			<ColumnDefinition Width="50"/>
+		</Grid.ColumnDefinitions>
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="100"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="100"/>
+		</Grid.RowDefinitions>
+
+		<Button Content="&lt;" VerticalAlignment="Top" Command="{Binding OpenPostsWindowCommand}"/>
+
+		<DockPanel Grid.Column="1" Grid.Row="0">			
+
+			<StackPanel VerticalAlignment="Center" Orientation="Horizontal" DockPanel.Dock="Left">
+				<TextBlock Text="Список сценариев" FontSize="60" VerticalAlignment="Center"/>
+				<TextBlock FontSize="60" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding SelectedVkPost.VkId}"/>
+			</StackPanel>
+
+			<ListBox Name="Messages" ItemsSource="{Binding Messages}" Background="Transparent" Height="100" Width="600" Margin="50,0,0,0">
+				<ListBox.ItemTemplate>
+					<DataTemplate>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<TextBox FontSize="10" Text="{Binding}" BorderThickness="0" AcceptsReturn="True" TextWrapping="Wrap" IsReadOnly="True" Grid.Column="0"/>
+							<Button Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0,0,0" Background="Transparent" Command="{Binding $parent[ListBox].((vm:ScenariosVM)DataContext).DeleteMessageCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ListBoxItem}}}">
+								<Image Source="/Assets/close.png" Width="10" Height="15"/>
+							</Button>						
+						</Grid>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+
+			<ToggleSwitch OffContent="Выключен" OnContent="Включен" FontSize="20"  HorizontalAlignment="Right" VerticalAlignment="Center"  IsChecked="{Binding IsChecked}" Command="{Binding ChangePostStatusCommand}" IsVisible="{Binding IsSwitchVisible}" DockPanel.Dock="Right"/>
+		</DockPanel>
+					
+		<DataGrid Name="DGrid" Grid.Column="1" Grid.Row="1"  ItemsSource="{Binding SelectedVkPost.ScenariosCollection}"  GridLinesVisibility="All" BorderThickness="1" SelectedItem="{Binding SelectedScenario}">		
+			<DataGrid.Columns>
+				
+				<DataGridTemplateColumn Header="Название" Width="Auto" IsReadOnly="False">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<TextBox Text="{Binding Title}" TextWrapping="Wrap" BorderThickness="0"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+
+				<DataGridTemplateColumn Header="Текст" Width="*" IsReadOnly="False">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<TextBox Text="{Binding Content}" AcceptsReturn="True" TextWrapping="Wrap" BorderThickness="0"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>		
+				
+				<DataGridTemplateColumn Header="Изображение" IsReadOnly="True">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<Image Height="100" Width="100" Source="{Binding GridImage}" Margin="0,10,0,10"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+				
+			</DataGrid.Columns>
+		</DataGrid>
+
+		<DockPanel Name="BottomPanel" Grid.Row="2" Grid.Column="1" LastChildFill="False">
+			
+			<StackPanel Grid.Column="1" Grid.Row="2"  HorizontalAlignment="Left" VerticalAlignment="Center" Width="180" DockPanel.Dock="Left">
+				<Button Grid.Column="1" Grid.Row="2" Width="180" Height="50"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Content="Сохранить" FontSize="30" Command="{Binding SaveScenariosCommand}"/>
+				<Button Grid.Column="1" Grid.Row="2" Width="150" Height="30" HorizontalAlignment="Center"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,5,0,5"  Content="Удалить" FontSize="15"  IsVisible="{Binding IsSwitchVisible}" Click="DeleteButtonClick"/>
+			</StackPanel>
+	
+				<StackPanel Name="KeyWordPanel" Orientation="Horizontal" Height="20" DockPanel.Dock="Left" Margin="10,0,0,0">
+					<TextBlock Text="Ключевое слово:" VerticalAlignment="Center"/>
+					<TextBox Width="250" Margin="5,0,0,0" Text="{Binding SelectedVkPost.KeyWord}"/>
+				</StackPanel>		
+
+				<StackPanel Name="DeleteConfirmation" VerticalAlignment="Center" Orientation="Horizontal">
+					<TextBlock Text="Вы точно хотите удалить этот пост? (Он станет не активным)"  VerticalAlignment="Center" Margin="10,0,0,0"/>
+					<Button Content="Да"  VerticalAlignment="Center" Margin="5,0,0,0" Command="{Binding DeletePostCommand}"/>
+					<Button Content="Нет"  VerticalAlignment="Center" Margin="5,0,0,0" Click="CancelDeletion"/>
+				</StackPanel>
+
+				<StackPanel Orientation="Horizontal" Margin="0,0,0,0" DockPanel.Dock="Right">
+
+					<StackPanel Name="ImagesControlPanel" IsVisible="{Binding IsMinusBtnVisible}" VerticalAlignment="Center">
+						<Button Content="Изменить изображение" HorizontalAlignment="Center" Command="{Binding ChangeCommentImageCommand}"/>
+						<Button Content="Удалить изображение" HorizontalAlignment="Center" Margin="0,5,0,0" Command="{Binding DeleteCommentImageCommand}"/>
+					</StackPanel>
+
+					<StackPanel Name="MinusAndPlusButtons" Orientation="Horizontal" HorizontalAlignment="Right" Margin="50,0,0,0">
+						<Button Width="50" Height="50"  HorizontalAlignment="Right" VerticalAlignment="Center" Content="-" FontSize="30"  HorizontalContentAlignment="Center" VerticalContentAlignment="Top" Margin="0,0,10,0" IsVisible="{Binding IsMinusBtnVisible}" Command="{Binding DeleteScenarioCommand}"/>
+						<Button Width="50" Height="50"  HorizontalAlignment="Right" VerticalAlignment="Center" Content="+" FontSize="30"  HorizontalContentAlignment="Center" VerticalContentAlignment="Top" Command="{Binding AddScenarioCommand}"/>
+					</StackPanel>
+				</StackPanel>
+
+		</DockPanel>
+
+	</Grid>
+
+</Window>
